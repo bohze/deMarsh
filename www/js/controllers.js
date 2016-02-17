@@ -5,38 +5,31 @@ angular.module('starter.controllers', [])
         $scope.ownY = null;
         $scope.ownMarkers = [];
 
-        /*
-         var posOptions = {timeout: 10000, enableHighAccuracy: false};
-         $cordovaGeolocation
-         .getCurrentPosition(posOptions)
-         .then(function (position) {
+
+
+
+        /*        var watchOptions = {
+         timeout: 3000,
+         enableHighAccuracy: false // may cause errors if true
+         };
+
+         var watch = $cordovaGeolocation.watchPosition(watchOptions);
+         watch.then(
+         null,
+         function (err) {
+         // error
+         },
+         function (position) {
          var lat = position.coords.latitude;
          var long = position.coords.longitude;
-         }, function (err) {
-         // error
+
+         $scope.ownY = lat;
+         $scope.ownX = long;
+         console.log('Y: ' + $scope.ownY);
+         console.log('X: ' + $scope.ownX);
+
          });
          */
-
-        var watchOptions = {
-            timeout: 3000,
-            enableHighAccuracy: false // may cause errors if true
-        };
-
-        var watch = $cordovaGeolocation.watchPosition(watchOptions);
-        watch.then(
-            null,
-            function (err) {
-                // error
-            },
-            function (position) {
-                var lat = position.coords.latitude;
-                var long = position.coords.longitude;
-
-                $scope.ownY = lat;
-                $scope.ownX = long;
-
-            });
-
 
         /*        watch.clearWatch();
          // OR
@@ -64,6 +57,23 @@ angular.module('starter.controllers', [])
         var stopMarkers = null;
         loadVehicles();
         loadStops();
+        getOwnPosition();
+
+
+        function getOwnPosition() {
+            var posOptions = {timeout: 10000, enableHighAccuracy: false};
+            $cordovaGeolocation
+                .getCurrentPosition(posOptions)
+                .then(function (position) {
+                    var lat = position.coords.latitude;
+                    var long = position.coords.longitude;
+                    $scope.ownY = lat;
+                    $scope.ownX = long;
+                }, function (err) {
+                    // error
+                });
+            setTimeout(getOwnPosition, 10000);
+        }
 
         function loadVehicles() {
             M10factory.getVehicles().success(function (data) {
@@ -107,9 +117,9 @@ angular.module('starter.controllers', [])
                 var xArr = [];
                 var yArr = [];
                 var vehicle;
-                for (j = 0; j <= Math.min($scope.vehicles.length - 1, 3); j++) {
-                    for (i = 0; i <= $scope.vehicles[j].length - 1; i++) {
-                        vehicle = $scope.vehicles[j][i];
+                if(count($scope.vehicles) > 0){
+                    for (i = 0; i <= $scope.vehicles[0].length - 1; i++) {
+                        vehicle = $scope.vehicles[0][i];
 
                         xArr.push(vehicle.X);
                         yArr.push(vehicle.Y);
@@ -177,8 +187,8 @@ angular.module('starter.controllers', [])
 
                     $scope.ownMarkers.push(new MarkerWithLabel({
                         zIndex: 3,
-                        icon: stopIcon,
-                        position: new google.maps.LatLng(Sscope.ownY, Sscope.ownX),
+                        icon: ownIcon,
+                        position: new google.maps.LatLng($scope.ownY, $scope.ownX),
                         map: $scope.map
                     }));
                 }
